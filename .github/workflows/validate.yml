@@ -9,6 +9,8 @@ jobs:
         run: for f in workflows/*.json attacks/*.json; do python3 -m json.tool "$f" > /dev/null && echo "ok $f"; done
       - name: Check Python syntax
         run: python3 -m py_compile run_attacks.py
+      - name: Test tool-level controls
+        run: node tests/test_tools.js
       - name: Block committed API keys
         run: |
           if grep -rEn 'sk-or-[A-Za-z0-9-]{20,}|sk-[A-Za-z0-9]{32,}|glpat-[A-Za-z0-9_-]{20}' --include='*.json' --include='*.py' --include='*.md' .; then
