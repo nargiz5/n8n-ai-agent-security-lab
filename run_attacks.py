@@ -7,7 +7,7 @@ Usage:
 
 Each scenario runs in a fresh chat session. Results are written to results/<label>.json and results/<label>.md.
 """
-import argparse, json, os, sys, time, urllib.request, uuid
+import argparse, json, os, re, sys, time, urllib.request, uuid
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -22,10 +22,20 @@ def send(url, prompt, timeout):
     return data
 
 
+def normalise(text):
+    """Lower-case and drop everything except letters and digits."""
+    return re.sub(r"[^a-z0-9]", "", text.lower())
+
+
 def matches(rules, output, steps):
     for rule in rules:
         hay = output if rule["type"] == "output_contains" else steps
         if rule["value"].lower() in hay.lower():
+            return True
+        # Model text is also compared after normalisation, so trivial reformatting
+        # ("CANARY 7F3A", "4,100", a rule re-wrapped across lines) is still caught.
+        # Tool steps are exact strings produced by code and are matched as-is.
+        if rule["type"] == "output_contains" and normalise(rule["value"]) in normalise(hay):
             return True
     return False
 
