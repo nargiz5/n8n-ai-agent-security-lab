@@ -1,5 +1,9 @@
 # n8n AI Agent Security Lab
 
+[![Validate](https://github.com/nargiz5/n8n-ai-agent-security-lab/actions/workflows/validate.yml/badge.svg)](https://github.com/nargiz5/n8n-ai-agent-security-lab/actions/workflows/validate.yml)
+![OWASP LLM Top 10 2025](https://img.shields.io/badge/OWASP-LLM%20Top%2010%202025-blue)
+![License: MIT](https://img.shields.io/badge/license-MIT-green)
+
 A lab for attacking and defending a tool-using AI agent built in [n8n](https://n8n.io).
 
 The same IT helpdesk agent ships in two versions, **vulnerable** and **hardened**. Attack scenarios mapped to the [OWASP Top 10 for LLM Applications (2025)](https://genai.owasp.org/llm-top-10/) are replayed against both, and deterministic tests verify the security controls in code.
@@ -14,6 +18,37 @@ An IT helpdesk assistant with chat memory and four tools. All data is fictional.
 | `read_ticket` | Returns a helpdesk ticket | User-controlled text with injected instructions |
 | `reset_password` | Sends a password reset link | Privileged action on other users |
 | `send_email` | Sends an email | Data exfiltration |
+
+## Architecture
+
+```mermaid
+flowchart LR
+    U[Chat user] --> T[Chat Trigger]
+    T --> G{Input Guard<br/>hardened only}
+    G -- blocked --> R[Refuse]
+    G -- allowed --> A[Helpdesk Agent]
+    A <--> M[LLM via OpenRouter]
+    A --> T1[lookup_employee]
+    A --> T2[read_ticket]
+    A --> T3[reset_password]
+    A --> T4[send_email]
+    A --> O[Output Guard<br/>hardened only]
+    O --> U
+    R --> U
+```
+
+n8n provides the chat interface and agent loop. The security logic is code: each tool and guard is a JavaScript Code node, and the attack runner and tests are separate programs.
+
+## Code
+
+| Part | Language | What it does |
+|---|---|---|
+| Tools and guards in the workflows | JavaScript | Tool logic plus the hardened controls: content sanitisation, data minimisation, authorisation, email allowlist, input and output guards |
+| [`run_attacks.py`](run_attacks.py) | Python (standard library only) | Replays every scenario against a live agent in fresh sessions, detects leaks and tool misuse, and writes reports with verdicts per run |
+| [`attacks/attacks.json`](attacks/attacks.json) | JSON | Scenarios and their detection rules |
+| [`tests/test_tools.js`](tests/test_tools.js) | JavaScript | Extracts the tool and guard code from both workflow exports and runs every check without a model |
+| [`tests/test_runner.py`](tests/test_runner.py) | Python | Tests the runner against a local fake webhook, including malformed responses and repeated runs |
+| [`.github/workflows/validate.yml`](.github/workflows/validate.yml) | GitHub Actions | Validates the files, runs both test suites and blocks committed API keys on every push |
 
 ## Attack scenarios
 
