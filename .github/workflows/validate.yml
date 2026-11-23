@@ -6,11 +6,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Validate JSON files
-        run: for f in workflows/*.json attacks/*.json; do python3 -m json.tool "$f" > /dev/null && echo "ok $f"; done
+        run: |
+          for f in workflows/*.json attacks/*.json; do
+            python3 -m json.tool "$f" > /dev/null || { echo "Invalid JSON: $f"; exit 1; }
+            echo "ok $f"
+          done
       - name: Check Python syntax
         run: python3 -m py_compile run_attacks.py
       - name: Test tool-level controls
         run: node tests/test_tools.js
+      - name: Test the attack runner
+        run: python3 -m unittest discover -s tests -p "test_*.py" -v
       - name: Block committed API keys
         run: |
           if grep -rEn 'sk-or-[A-Za-z0-9-]{20,}|sk-[A-Za-z0-9]{32,}|glpat-[A-Za-z0-9_-]{20}' --include='*.json' --include='*.py' --include='*.md' .; then
