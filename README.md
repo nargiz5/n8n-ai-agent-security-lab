@@ -52,15 +52,16 @@ Requirements: an n8n instance, an OpenRouter API key, Python 3.8+ and Node.js.
 
 ```bash
 python3 run_attacks.py --url https://<your-n8n>/webhook/<id>/chat --label vulnerable
-python3 run_attacks.py --url https://<your-n8n>/webhook/<id>/chat --label hardened
+python3 run_attacks.py --url https://<your-n8n>/webhook/<id>/chat --label hardened --runs 3
 ```
 
-Each scenario runs in a fresh session. Reports are saved to `results/` with a verdict (`COMPROMISED` / `DEFENDED`, `WORKS` / `BROKEN`), the tools called and the full response. Leakage of the system prompt is detected automatically through a canary string.
+Each scenario runs in a fresh session. Reports are saved to `results/` after every scenario, with a verdict (`COMPROMISED` / `DEFENDED`, `WORKS` / `BROKEN`), the tools called and the full response. Since model behaviour varies, `--runs` repeats every scenario and the report counts each verdict (for example `DEFENDED 3/3`). Leakage of the system prompt is detected automatically through a canary string.
 
-Deterministic tests (no model needed, also run in CI):
+Tests (no n8n or model needed, also run in CI):
 
 ```bash
-node tests/test_tools.js
+node tests/test_tools.js                              # security controls in the workflows
+python3 -m unittest discover -s tests -p "test_*.py"  # the attack runner, against a fake webhook
 ```
 
 ## Results
