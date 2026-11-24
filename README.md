@@ -6,7 +6,7 @@
 
 A lab for attacking and defending a tool-using AI agent built in [n8n](https://n8n.io).
 
-The same IT helpdesk agent ships in two versions, **vulnerable** and **hardened**. Attack scenarios mapped to the [OWASP Top 10 for LLM Applications (2025)](https://genai.owasp.org/llm-top-10/) are replayed against both, and deterministic tests verify the security controls in code.
+The same IT helpdesk agent ships in two versions, **vulnerable** and **hardened**, so the effect of each defense can be compared directly. The attack scenarios are mapped to the [OWASP Top 10 for LLM Applications (2025)](https://genai.owasp.org/llm-top-10/). Tests run the security controls in code and show which attacks the hardened version blocks, and a runner is included for trying the scenarios against a live agent.
 
 ## The agent
 
@@ -101,7 +101,7 @@ python3 -m unittest discover -s tests -p "test_*.py"  # the attack runner, again
 
 ## Results
 
-The  tests run the tool and guard code from both workflows directly:
+The tests run the tool and guard code from both workflows directly:
 
 | ID | Check | Vulnerable | Hardened |
 |---|---|---|---|
@@ -127,7 +127,7 @@ All 10 attack checks are blocked in the hardened version, and all legitimate ope
 
 ### Per scenario (hardened version)
 
-What the  tests establish for each attack scenario, independent of the model:
+What the tests establish for each attack scenario, independent of the model:
 
 | Scenario | Hardened result | Enforced by |
 |---|---|---|
