@@ -101,7 +101,7 @@ python3 -m unittest discover -s tests -p "test_*.py"  # the attack runner, again
 
 ## Results
 
-The deterministic tests run the tool and guard code from both workflows directly:
+The  tests run the tool and guard code from both workflows directly:
 
 | ID | Check | Vulnerable | Hardened |
 |---|---|---|---|
@@ -127,7 +127,7 @@ All 10 attack checks are blocked in the hardened version, and all legitimate ope
 
 ### Per scenario (hardened version)
 
-What the deterministic tests establish for each attack scenario, independent of the model:
+What the  tests establish for each attack scenario, independent of the model:
 
 | Scenario | Hardened result | Enforced by |
 |---|---|---|
@@ -141,11 +141,7 @@ What the deterministic tests establish for each attack scenario, independent of 
 | A8 Injection in an unclosed HTML comment | Blocked | Comment removal in `read_ticket` |
 | A9 Wrapper escape | Blocked | Markup escaping in `read_ticket` |
 
-### Live-model evaluation
 
-Pending. The runner is ready (`python3 run_attacks.py ... --runs 3`), and the results against a live model will be published here after the first run. A2 is the scenario to watch, since no code-level control covers it.
-
-> The chat triggers are public. Deactivate the workflows when you are not using the lab.
 
 ## License
 
